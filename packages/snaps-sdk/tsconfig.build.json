@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.packages.build.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/types",
+    "rootDir": "./src"
+  },
+  "include": ["./src"],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "./src/**/test-utils",
+    "./src/**/__mocks__",
+    "./src/**/__snapshots__"
+  ],
+  "references": []
+}

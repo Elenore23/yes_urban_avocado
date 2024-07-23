@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.packages.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "resolveJsonModule": true
+  },
+  "include": ["./src", "webpack.config.ts", "package.json"],
+  "references": [
+    {
+      "path": "../snaps-utils"
+    }
+  ]
+}

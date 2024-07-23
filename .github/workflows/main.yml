@@ -1,0 +1,96 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  #  check-workflows:
+  #    name: Check workflows
+  #    runs-on: gha-runner-scale-set
+  #    steps:
+  #      - uses: actions/checkout@v4
+  #      - name: Install curl
+  #        run: sudo apt install -y curl
+  #      - name: Download actionlint
+  #        id: download-actionlint
+  #        run: bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/7fdc9630cc360ea1a469eed64ac6d78caeda1234/scripts/download-actionlint.bash) 1.6.25
+  #        shell: bash
+  #      - name: Check workflow files
+  #        run: ${{ steps.download-actionlint.outputs.executable }} -color
+  #        shell: bash
+
+  lint-build-test:
+    name: Build, lint, and test
+    #    needs: check-workflows
+    uses: ./.github/workflows/build-lint-test.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  publish-staging-simulator:
+    name: Publish Snaps Simulator to `staging` folder
+    needs: lint-build-test
+    if: ${{ github.ref_name == 'main' }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-github-pages.yml
+    with:
+      build_script: yarn workspace @metamask/snaps-simulator build
+      publish_dir: ./packages/snaps-simulator/dist/webpack/main
+      destination_dir: snaps-simulator/staging
+    secrets:
+      PUBLISH_PAGES_TOKEN: ${{ secrets.PUBLISH_PAGES_TOKEN }}
+
+  is-release:
+    name: Determine whether this is a release merge commit
+    needs: lint-build-test
+    if: github.event_name == 'push'
+    runs-on: gha-runner-scale-set
+    outputs:
+      IS_RELEASE: ${{ steps.is-release.outputs.IS_RELEASE }}
+    steps:
+      - id: is-release
+        uses: MetaMask/action-is-release@v1
+        with:
+          commit-starts-with: 'Release [version]'
+
+  publish-release:
+    name: Publish release
+    needs: is-release
+    if: needs.is-release.outputs.IS_RELEASE == 'true'
+    permissions:
+      id-token: write
+      contents: write
+    uses: ./.github/workflows/publish-release.yml
+    with:
+      slack-subteam: S05RL9W7H54 # @metamask-snaps-publishers
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      PUBLISH_PAGES_TOKEN: ${{ secrets.PUBLISH_PAGES_TOKEN }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  all-jobs-complete:
+    name: All jobs complete
+    runs-on: gha-runner-scale-set
+    needs: lint-build-test
+    outputs:
+      passed: ${{ steps.set-output.outputs.passed }}
+    steps:
+      - name: Set passed output
+        id: set-output
+        run: echo "passed=true" >> "$GITHUB_OUTPUT"
+
+  all-jobs-pass:
+    name: All jobs pass
+    if: ${{ always() }}
+    runs-on: gha-runner-scale-set
+    needs: all-jobs-complete
+    steps:
+      - name: Check that all jobs have passed
+        run: |
+          passed="${{ needs.all-jobs-complete.outputs.passed }}"
+          if [[ $passed != "true" ]]; then
+            exit 1
+          fi
