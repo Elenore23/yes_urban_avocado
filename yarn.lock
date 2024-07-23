@@ -3954,12 +3954,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@metamask/browser-passworder@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@metamask/browser-passworder@npm:5.0.0"
+"@metamask/browser-passworder@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "@metamask/browser-passworder@npm:5.0.1"
   dependencies:
-    "@metamask/utils": ^8.2.0
-  checksum: f4ac33d9e42b8bcf89ee10bda96f854794e8fbeaa369192ea2f23893a96cb804cfcb2c0b73c1f6f06f5caa8c8cc866bcb6b5878e19a187a8da4823d581abc357
+    "@metamask/utils": ^9.0.0
+  checksum: d20e377fa93a3506c8a76d9e82d0b1cf328db8033e570ef6e41a51f0b1a0a098b96d157a65413aab334bac0bca9c34fd3269be94b5cc63a514133c85f02b955b
   languageName: node
   linkType: hard
 
@@ -5574,7 +5574,7 @@ __metadata:
     "@metamask/approval-controller": ^7.0.2
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/base-controller": ^6.0.2
-    "@metamask/browser-passworder": ^5.0.0
+    "@metamask/browser-passworder": ^5.0.1
     "@metamask/eslint-config": ^12.1.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
